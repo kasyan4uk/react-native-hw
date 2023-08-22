@@ -23,8 +23,7 @@ export const Input = (props) => {
       }}
       onChangeText={(text) => onInputChange({ name, value: text })}
       value={value}
-      autoComplete={'off'}
-      autoCorrect={false}
+      keyboardType={name === 'email' ? 'email-address' : 'default'}
     />
   );
 };

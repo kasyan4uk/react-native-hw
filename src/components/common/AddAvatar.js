@@ -1,6 +1,6 @@
 import { View, Image, Pressable, StyleSheet, Dimensions } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 
+import { pickImage } from '../utils/picklmage';
 import colors from '../../assets/colors/colors';
 
 const deviceWidth = Dimensions.get('window').width;
@@ -8,28 +8,16 @@ const deviceWidth = Dimensions.get('window').width;
 export const AddAvatar = (props) => {
   const { form, setForm } = props;
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (result.canceled) {
-      return;
-    }
-
-    setForm((prev) => ({ ...prev, avatarUrl: result.assets[0].uri }));
-  };
-
   return (
     <View style={styles.addAvatar}>
       {!form.avatarUrl && (
         <Pressable
           style={styles.addAvatarBtn}
           accessibilityLabel={'Add avatar'}
-          onPress={pickImage}
+          onPress={async () => {
+            const result = await pickImage();
+            setForm((prev) => ({ ...prev, avatarUrl: result.assets[0].uri }));
+          }}
         >
           <Image
             source={require('../../assets/images/addAvatar.png')}

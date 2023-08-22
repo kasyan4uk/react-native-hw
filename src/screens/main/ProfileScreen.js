@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { common } from '../../components/common';
+import { common } from '../../components/common'
 
 const { MainContainer, TextRobotoRegular } = common;
 
-export default PostsScreen = (props) => {
+export default ProfileScreen = (props) => {
   return (
     <MainContainer style={styles.container}>
-      <TextRobotoRegular>Публікації</TextRobotoRegular>
+      <TextRobotoRegular>ProfileScreen</TextRobotoRegular>
     </MainContainer>
   );
 };

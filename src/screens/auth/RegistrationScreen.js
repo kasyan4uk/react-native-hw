@@ -1,26 +1,29 @@
 import { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ImageBackground,
-  Dimensions,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Pressable,
+  useWindowDimensions,
 } from 'react-native';
 
 import colors from '../../assets/colors';
-import { smallDevice } from '../../components/utils/default';
+import smallDevice from '../../components/utils/smallDevice';
 import { common } from '../../components/common';
+import { isBtnDisable } from '../../components/utils/isBtnDisable';
 
-
-const { TextRobotoMedium, TextRobotoRegular, Btn, Input, Password, AddAvatar } = common;
-
-
-
-const deviceHeight = Dimensions.get('window').height;
-const deviceWidth = Dimensions.get('window').width;
+const {
+  TextRobotoMedium,
+  TextRobotoRegular,
+  Btn,
+  Input,
+  Password,
+  MainContainer,
+  AddAvatar,
+} = common;
 
 const initFormState = {
   avatarUrl: '',
@@ -29,79 +32,103 @@ const initFormState = {
   password: '',
 };
 
-export const RegistrationScreen = () => {
+export const RegistrationScreen = ({ navigation }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
   const [form, setForm] = useState(initFormState);
+
+  const { width: deviceWidth, height: deviceHeight } = useWindowDimensions();
 
   const handleInputChange = ({ name, value }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleKeybordToggle = (status) => {
     setIsKeyboardShown(status);
   };
-
   const handleFormSubmit = () => {
-    console.log(form);
+    navigation.navigate('Home');
     Keyboard.dismiss();
     setForm(initFormState);
   };
 
   return (
-    <ImageBackground
-      style={styles.backgroundImage}
-      source={require('../../assets/images/PhotoBG.jpg')}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <MainContainer>
+      <ImageBackground
+        style={{
+          ...styles.backgroundImage,
+          height: deviceHeight,
+          width: deviceWidth,
+        }}
+        source={require('../../assets/images/PhotoBG.jpg')}
       >
-        <View style={styles.form}>
-          <AddAvatar form={form} setForm={setForm} />
-          <View style={styles.titleWrapper}>
-            <TextRobotoMedium style={styles.title}>Реєстрація</TextRobotoMedium>
-          </View>
-          <Input
-            name={'login'}
-            value={form.login}
-            placeholder="Логін"
-            onInputChange={handleInputChange}
-            onKeybordToggle={handleKeybordToggle}
-          />
-          <Input
-            name={'email'}
-            value={form.email}
-            placeholder="Адреса електронної пошти"
-            onInputChange={handleInputChange}
-            onKeybordToggle={handleKeybordToggle}
-          />
-          <Password
-            name={'password'}
-            value={form.password}
-            placeholder="Пароль"
-            onInputChange={handleInputChange}
-            onKeybordToggle={handleKeybordToggle}
-          />
-          {!isKeyboardShown && (
-            <Btn title="Зареєструватися" onFormSubmit={handleFormSubmit} form={form} />
-          )}
-          {!isKeyboardShown && (
-            <View style={styles.navWrapper}>
-              <TextRobotoRegular style={styles.navLink}>
-                {'Вже є акаунт? Увійти'}
-              </TextRobotoRegular>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View
+            style={{
+              ...styles.form,
+              paddingBottom: deviceHeight > smallDevice.height ? 78 : 32,
+            }}
+          >
+            <AddAvatar form={form} setForm={setForm} />
+            <View
+              style={{
+                ...styles.titleWrapper,
+                marginTop: deviceHeight > smallDevice.height ? 92 : 72,
+              }}
+            >
+              <TextRobotoMedium style={styles.title}>
+                Реєстрація
+              </TextRobotoMedium>
             </View>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+            <Input
+              name={'login'}
+              value={form.login}
+              placeholder="Логін"
+              onInputChange={handleInputChange}
+              onKeybordToggle={handleKeybordToggle}
+            />
+            <Input
+              name={'email'}
+              value={form.email}
+              placeholder="Адреса електронної пошти"
+              onInputChange={handleInputChange}
+              onKeybordToggle={handleKeybordToggle}
+            />
+            <Password
+              name={'password'}
+              value={form.password}
+              placeholder="Пароль"
+              onInputChange={handleInputChange}
+              onKeybordToggle={handleKeybordToggle}
+            />
+            {!isKeyboardShown && (
+              <Btn
+                title="Зареєструватися"
+                onFormSubmit={handleFormSubmit}
+                isDisable={isBtnDisable(form)}
+                style={{ marginTop: 43 }}
+              />
+            )}
+            {!isKeyboardShown && (
+              <Pressable
+                style={styles.navWrapper}
+                onPress={() => navigation.navigate('Login')}
+              >
+                <TextRobotoRegular style={styles.navLink}>
+                  {'Вже є акаунт? Увійти'}
+                </TextRobotoRegular>
+              </Pressable>
+            )}
+          </View>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </MainContainer>
   );
 };
 
 const styles = StyleSheet.create({
   backgroundImage: {
     resizeMode: 'cover',
-    height: deviceHeight,
-    width: deviceWidth,
     justifyContent: 'flex-end',
   },
   form: {
@@ -109,18 +136,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.PRIMARY_BG,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingBottom: deviceHeight > smallDevice ? 78 : 32,
   },
   title: {
     color: colors.PRIMARY_TEXT_COLOR,
     fontSize: 30,
     lineHeight: 35,
-    fontWeight: 500,
   },
   titleWrapper: {
     alignItems: 'center',
     marginBottom: 16,
-    marginTop: deviceHeight > smallDevice ? 92 : 72,
   },
   navWrapper: {
     justifyContent: 'center',
@@ -131,6 +155,5 @@ const styles = StyleSheet.create({
     color: colors.NAV_TEXT_COLOR,
     fontSize: 16,
     lineHeight: 19,
-    fontWeight: 400,
   },
 });

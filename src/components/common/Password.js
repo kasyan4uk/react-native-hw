@@ -15,7 +15,7 @@ export const Password = (props) => {
         onPress={() => setShowPassword((prev) => !prev)}
       >
         <TextRobotoRegular style={styles.showMsg}>
-          {!showPassword ? 'Приховати' : 'Показати'}
+          {!showPassword ? 'Сховати' : 'Показати'}
         </TextRobotoRegular>
       </Pressable>
       <TextInput
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
     color: colors.NAV_TEXT_COLOR,
     fontSize: 16,
     lineHeight: 19,
-    fontWeight: 400,
   },
   input: {
     backgroundColor: colors.SECONDARY_BG,

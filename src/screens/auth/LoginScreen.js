@@ -3,93 +3,117 @@ import {
   View,
   StyleSheet,
   ImageBackground,
-  Dimensions,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Pressable,
+  useWindowDimensions,
 } from 'react-native';
 
-import { smallDevice } from '../../components/utils/default';
-
+import smallDevice from '../../components/utils/smallDevice';
 import colors from '../../assets/colors';
 import { common } from '../../components/common';
+import { isBtnDisable } from '../../components/utils/isBtnDisable';
+import { ScrollView } from 'react-native-gesture-handler';
 
-const { TextRobotoMedium, TextRobotoRegular, Btn, Input, Password } = common;
-
-
-const deviceHeight = Dimensions.get('window').height;
-const deviceWidth = Dimensions.get('window').width;
+const {
+  TextRobotoMedium,
+  TextRobotoRegular,
+  Btn,
+  Input,
+  Password,
+  MainContainer,
+} = common;
 
 const initFormState = {
   email: '',
   password: '',
 };
 
-export const LoginScreen = () => {
+export const LoginScreen = ({ navigation }) => {
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
   const [form, setForm] = useState(initFormState);
+
+  const { width: deviceWidth, height: deviceHeight } = useWindowDimensions();
 
   const handleInputChange = ({ name, value }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleKeybordToggle = (status) => {
     setIsKeyboardShown(status);
   };
-
   const handleFormSubmit = () => {
-    console.log(form);
+    navigation.navigate('Home');
     Keyboard.dismiss();
     setForm(initFormState);
   };
 
   return (
-    <ImageBackground
-      style={styles.backgroundImage}
-      source={require('../../assets/images/PhotoBG.jpg')}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <MainContainer>
+      <ImageBackground
+        style={{
+          ...styles.backgroundImage,
+          height: deviceHeight,
+          width: deviceWidth,
+        }}
+        source={require('../../assets/images/PhotoBG.jpg')}
       >
-        <View style={styles.form}>
-          <View style={styles.titleWrapper}>
-            <TextRobotoMedium style={styles.title}>Увійти</TextRobotoMedium>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View
+            style={{
+              ...styles.form,
+              paddingBottom: deviceHeight > smallDevice.height ? 144 : 32,
+            }}
+          >
+            <ScrollView>
+              <View style={styles.titleWrapper}>
+                <TextRobotoMedium style={styles.title}>Увійти</TextRobotoMedium>
+              </View>
+              <Input
+                name={'email'}
+                value={form.email}
+                placeholder="Адреса електронної пошти"
+                onInputChange={handleInputChange}
+                onKeybordToggle={handleKeybordToggle}
+              />
+              <Password
+                name={'password'}
+                value={form.password}
+                placeholder="Пароль"
+                onInputChange={handleInputChange}
+                onKeybordToggle={handleKeybordToggle}
+              />
+              {!isKeyboardShown && (
+                <Btn
+                  title="Увійти"
+                  onFormSubmit={handleFormSubmit}
+                  isDisable={isBtnDisable(form)}
+                  style={{ marginTop: 43 }}
+                />
+              )}
+              {!isKeyboardShown && (
+                <Pressable
+                  style={styles.navWrapper}
+                  onPress={() => navigation.navigate('Registration')}
+                >
+                  <TextRobotoRegular style={styles.navLink}>
+                    {"Неамає акаунту? Зареєструватися"}
+                  </TextRobotoRegular>
+                </Pressable>
+              )}
+            </ScrollView>
           </View>
-          <Input
-            name={'email'}
-            value={form.email}
-            placeholder="Адреса електронної пошти"
-            onInputChange={handleInputChange}
-            onKeybordToggle={handleKeybordToggle}
-          />
-          <Password
-            name={'password'}
-            value={form.password}
-            placeholder="Пароль"
-            onInputChange={handleInputChange}
-            onKeybordToggle={handleKeybordToggle}
-          />
-          {!isKeyboardShown && (
-            <Btn title="Увійти" onFormSubmit={handleFormSubmit} form={form} />
-          )}
-          {!isKeyboardShown && (
-            <View style={styles.navWrapper}>
-              <TextRobotoRegular style={styles.navLink}>
-                {"Немає акаунту? Зареєструватися"}
-              </TextRobotoRegular>
-            </View>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </MainContainer>
   );
 };
 
 const styles = StyleSheet.create({
   backgroundImage: {
     resizeMode: 'cover',
-    height: deviceHeight,
-    width: deviceWidth,
     justifyContent: 'flex-end',
   },
   form: {
@@ -97,13 +121,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.PRIMARY_BG,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingBottom: deviceHeight > smallDevice ? 144 : 32,
   },
   title: {
     color: colors.PRIMARY_TEXT_COLOR,
     fontSize: 30,
     lineHeight: 35,
-    fontWeight: 500,
   },
   titleWrapper: {
     alignItems: 'center',
@@ -119,6 +141,5 @@ const styles = StyleSheet.create({
     color: colors.NAV_TEXT_COLOR,
     fontSize: 16,
     lineHeight: 19,
-    fontWeight: 400,
   },
 });
