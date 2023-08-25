@@ -1,4 +1,4 @@
-import { common } from "../../components/common";
+import  { common }  from "../../components/common";
 
 const { MainContainer, TextRobotoRegular } = common;
 

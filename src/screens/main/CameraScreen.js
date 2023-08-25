@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TouchableOpacity, View, ImageBackground } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
+import * as Location from 'expo-location';
 import { Feather, Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
 
 import { StyleSheet } from 'react-native';
@@ -10,6 +11,7 @@ const { CameraBtn } = common;
 
 export const CameraScreen = (props) => {
   const {
+    hasPermission = false,
     cameraStatus,
     photo,
     setCameraStatus,
@@ -23,12 +25,17 @@ export const CameraScreen = (props) => {
 
   const createPhoto = async () => {
     const takenPhoto = await cameraRef.takePictureAsync();
-    setForm((prev) => ({ ...prev, imageUrl: takenPhoto.uri }));
+    const location = await Location.getCurrentPositionAsync();
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+    setForm((prev) => ({ ...prev, imageUrl: takenPhoto.uri, coords }));
   };
 
   return (
     <>
-      {cameraStatus && photo && (
+      {cameraStatus && photo && hasPermission && (
         <View style={styles.takePhotoContainer}>
           <ImageBackground
             source={{ uri: photo }}
@@ -61,7 +68,7 @@ export const CameraScreen = (props) => {
           </ImageBackground>
         </View>
       )}
-      {cameraStatus && !photo && (
+      {cameraStatus && !photo && hasPermission && (
         <Camera
           style={{ ...styles.camera, height: deviceHeight - 60 }}
           ref={setCameraRef}
