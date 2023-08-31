@@ -7,10 +7,8 @@ export const pickImage = async () => {
     aspect: [4, 3],
     quality: 1,
   });
-
   if (result.canceled) {
     return null;
   }
-
   return result;
 };

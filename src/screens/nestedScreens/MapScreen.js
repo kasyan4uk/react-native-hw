@@ -1,34 +1,26 @@
-import { useEffect, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 export default MapScreen = ({ route }) => {
-  const [location, setLocation] = useState({});
   const { width, height } = useWindowDimensions();
-
-  useEffect(() => {
-    setLocation({
-      latitude: route.params.latitude,
-      longitude: route.params.longitude,
-    });
-  }, []);
+  const { latitude, longitude } = route.params.coords;
 
   return (
     <View style={styles.container}>
       <MapView
         style={{ width, height }}
-        region={{
-          latitude: location.latitude,
-          longitude: location.longitude,
+        initialRegion={{
+          latitude,
+          longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
         showsUserLocation={true}
       >
         <Marker
-          title="Publication "
-          coordinate={location}
-          description="Your current location"
+          title="Post"
+          coordinate={{ latitude, longitude }}
+          description="Posts current location"
         />
       </MapView>
     </View>

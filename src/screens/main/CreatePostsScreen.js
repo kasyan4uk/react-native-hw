@@ -12,12 +12,15 @@ import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import * as Location from 'expo-location';
+import { useSelector } from 'react-redux';
 
 import { CameraScreen } from './CameraScreen';
-import { common } from '../../components/common';
-import colors from '../../assets/colors/colors';
-import { pickImage } from '../../components/utils/picklmage';
-import { isBtnDisable } from '../../components/utils/isBtnDisable';
+import common from '../../components/common';
+import colors from '../../assets/colors';
+import { pickImage } from '../../utils/pickImage';
+import { isBtnDisable } from '../../utils/isBtnDisable';
+import { addPost } from '../../services/firestoreOperations';
+import { selectUser } from '../../redux/auth/authSelector';
 
 const { MainContainer, Btn, TextRobotoRegular } = common;
 const initState = {
@@ -34,24 +37,30 @@ export default CreatePostsScreen = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraStatus, setCameraStatus] = useState(false);
   const [form, setForm] = useState(initState);
+  const { uid } = useSelector(selectUser);
 
   const { imageUrl: photo } = form;
   const { width: deviceWidth, height: deviceHeight } = useWindowDimensions();
 
+  const onImagePick = async () => {
+    const result = await pickImage();
+    const location = await Location.getCurrentPositionAsync();
+    const imageUrl = result?.assets[0].uri || null;
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+    setForm((prev) => ({
+      ...prev,
+      imageUrl,
+      coords,
+    }));
+  };
+
   const onFormSubmit = async () => {
-    if (!form.coords.latitude) {
-      const location = await Location.getCurrentPositionAsync();
-      const coords = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      };
-      setForm((prev) => ({
-        ...prev,
-        imageUrl: takenPhoto.uri,
-        coords,
-      }));
-    }
+    setForm(initState);
     navigation.navigate('Posts');
+    await addPost({ ...form, uid });
   };
 
   useEffect(() => {
@@ -102,7 +111,7 @@ export default CreatePostsScreen = ({ navigation }) => {
                   width: deviceWidth - 32,
                   height: (deviceWidth - 32) * 0.7,
                 }}
-                source={{ uri: photo || null }}
+                source={{ uri: form.imageUrl || null }}
               >
                 <Pressable
                   style={{
@@ -127,18 +136,9 @@ export default CreatePostsScreen = ({ navigation }) => {
                 </Pressable>
               </ImageBackground>
             </View>
-            <Pressable
-              style={styles.addPhotoTextWrap}
-              onPress={async () => {
-                let result = await pickImage();
-                setForm((prev) => ({
-                  ...prev,
-                  imageUrl: result.assets[0].uri || null,
-                }));
-              }}
-            >
+            <Pressable style={styles.addPhotoTextWrap} onPress={onImagePick}>
               <TextRobotoRegular style={styles.addPhotoText}>
-                {photo ? 'Редагуйте фото' : 'Завантажте фото'}
+                {photo ? 'Зробити фото' : 'Завантажте фото'}
               </TextRobotoRegular>
             </Pressable>
             <View
@@ -159,7 +159,7 @@ export default CreatePostsScreen = ({ navigation }) => {
               />
             </View>
             <View style={{ ...styles.inputContanier, marginBottom: 32 }}>
-            <Pressable style={styles.mapPinWrap}>
+              <Pressable style={styles.mapPinWrap}>
                 <Feather
                   name="map-pin"
                   size={24}

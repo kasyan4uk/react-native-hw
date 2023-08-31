@@ -1,3 +1,3 @@
 export default smallDevice = {
-  height: 568,
+  height: 568, // 4 inches
 };

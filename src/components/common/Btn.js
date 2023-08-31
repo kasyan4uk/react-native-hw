@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { TextRobotoRegular } from './TextRobotoRegular';
 import colors from '../../assets/colors';
 

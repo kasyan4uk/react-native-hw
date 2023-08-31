@@ -5,16 +5,17 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
   Pressable,
   useWindowDimensions,
+  ScrollView,
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
-import smallDevice from '../../components/utils/smallDevice';
 import colors from '../../assets/colors';
-import { common } from '../../components/common';
-import { isBtnDisable } from '../../components/utils/isBtnDisable';
-import { ScrollView } from 'react-native-gesture-handler';
+import smallDevice from '../../utils/smallDeviceDimens';
+import common from '../../components/common';
+import { isBtnDisable } from '../../utils/isBtnDisable';
+import { authSignIn } from '../../redux/auth/authOperations';
 
 const {
   TextRobotoMedium,
@@ -31,35 +32,31 @@ const initFormState = {
 };
 
 export const LoginScreen = ({ navigation }) => {
-  const [isKeyboardShown, setIsKeyboardShown] = useState(false);
   const [form, setForm] = useState(initFormState);
+  const dispatch = useDispatch();
 
   const { width: deviceWidth, height: deviceHeight } = useWindowDimensions();
 
   const handleInputChange = ({ name, value }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-  const handleKeybordToggle = (status) => {
-    setIsKeyboardShown(status);
-  };
   const handleFormSubmit = () => {
-    navigation.navigate('Home');
-    Keyboard.dismiss();
+    dispatch(authSignIn(form));
     setForm(initFormState);
   };
 
   return (
     <MainContainer>
-      <ImageBackground
-        style={{
-          ...styles.backgroundImage,
-          height: deviceHeight,
-          width: deviceWidth,
-        }}
-        source={require('../../assets/images/PhotoBG.jpg')}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        <ImageBackground
+          style={{
+            ...styles.backgroundImage,
+            height: deviceHeight,
+            width: deviceWidth,
+          }}
+          source={require('../../assets/images/PhotoBG2x.jpg')}
         >
           <View
             style={{
@@ -76,37 +73,31 @@ export const LoginScreen = ({ navigation }) => {
                 value={form.email}
                 placeholder="Адреса електронної пошти"
                 onInputChange={handleInputChange}
-                onKeybordToggle={handleKeybordToggle}
               />
               <Password
                 name={'password'}
                 value={form.password}
                 placeholder="Пароль"
                 onInputChange={handleInputChange}
-                onKeybordToggle={handleKeybordToggle}
               />
-              {!isKeyboardShown && (
-                <Btn
-                  title="Увійти"
-                  onFormSubmit={handleFormSubmit}
-                  // isDisable={isBtnDisable(form)}
-                  style={{ marginTop: 43 }}
-                />
-              )}
-              {!isKeyboardShown && (
-                <Pressable
-                  style={styles.navWrapper}
-                  onPress={() => navigation.navigate('Registration')}
-                >
-                  <TextRobotoRegular style={styles.navLink}>
-                    {"Неамає акаунту? Зареєструватися"}
-                  </TextRobotoRegular>
-                </Pressable>
-              )}
+              <Btn
+                title="Увійти"
+                onFormSubmit={handleFormSubmit}
+                isDisable={isBtnDisable(form)}
+                style={{ marginTop: 43 }}
+              />
+              <Pressable
+                style={styles.navWrapper}
+                onPress={() => navigation.navigate('Registration')}
+              >
+                <TextRobotoRegular style={styles.navLink}>
+                  {"Немає акаунту? Зареєструватися"}
+                </TextRobotoRegular>
+              </Pressable>
             </ScrollView>
           </View>
-        </KeyboardAvoidingView>
-      </ImageBackground>
+        </ImageBackground>
+      </KeyboardAvoidingView>
     </MainContainer>
   );
 };

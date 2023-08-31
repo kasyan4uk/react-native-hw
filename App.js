@@ -2,19 +2,65 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as SplashScreen from 'expo-splash-screen';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { onAuthStateChanged } from 'firebase/auth';
 
-import { loadFonts } from './src/components/utils/loadFonts';
+import { store } from './src/redux/store';
+import { loadFonts } from './src/utils/loadFonts';
 import { RegistrationScreen } from './src/screens/auth/RegistrationScreen';
 import { LoginScreen } from './src/screens/auth/LoginScreen';
 import { HomeScreen } from './src/screens/main/HomeScreen';
+import { selectIsAuth } from './src/redux/auth/authSelector';
+import { setUser } from './src/redux/auth/authSlice';
+import { auth } from './src/firebase/firebase.config';
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
-export default function App() {
-  const [isReady, setIsReady] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
+const App = () => {
+  const dispatch = useDispatch();
+  const isAuth = useSelector(selectIsAuth);
 
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const currentUser = {
+          uid: user.uid,
+          avatarUrl: user.photoURL,
+          email: user.email,
+          login: user.displayName,
+        };
+        setTimeout(() => {
+          dispatch(setUser({ user: currentUser, isAuth: true }));
+        }, 0);
+      }
+    });
+  }, []);
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="Registration"
+        screenOptions={{ headerShown: false }}
+      >
+        {!isAuth ? (
+          <>
+            <Stack.Screen name="Registration" component={RegistrationScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default () => {
+  const [isReady, setIsReady] = useState(false);
+
+  SplashScreen.preventAutoHideAsync();
   useEffect(() => {
     (async () => {
       try {
@@ -32,16 +78,9 @@ export default function App() {
     return null;
   } else {
     return (
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Registration"
-          screenOptions={{ headerShown: false }}
-        >
-          <Stack.Screen name="Registration" component={RegistrationScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <Provider store={store}>
+        <App />
+      </Provider>
     );
   }
-}
+};

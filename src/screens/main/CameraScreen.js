@@ -4,8 +4,8 @@ import { Camera, CameraType } from 'expo-camera';
 import * as Location from 'expo-location';
 import { Feather, Ionicons, Entypo, MaterialIcons } from '@expo/vector-icons';
 
+import common from '../../components/common';
 import { StyleSheet } from 'react-native';
-import { common } from '../../components/common';
 
 const { CameraBtn } = common;
 
@@ -41,7 +41,7 @@ export const CameraScreen = (props) => {
             source={{ uri: photo }}
             style={{
               ...styles.takePhotoImg,
-              height: deviceHeight - 60,
+              height: deviceHeight - 80,
               width: deviceWidth,
             }}
           >
@@ -70,7 +70,7 @@ export const CameraScreen = (props) => {
       )}
       {cameraStatus && !photo && hasPermission && (
         <Camera
-          style={{ ...styles.camera, height: deviceHeight - 60 }}
+          style={{ ...styles.camera, height: deviceHeight - 80 }}
           ref={setCameraRef}
           type={type}
         >

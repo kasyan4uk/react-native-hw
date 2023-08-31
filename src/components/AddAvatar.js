@@ -1,7 +1,7 @@
 import { View, Image, Pressable, StyleSheet, Dimensions } from 'react-native';
 
-import { pickImage } from '../utils/picklmage';
-import colors from '../../assets/colors/colors';
+import colors from '../assets/colors';
+import { pickImage } from '../utils/pickImage';
 
 const deviceWidth = Dimensions.get('window').width;
 
@@ -16,11 +16,14 @@ export const AddAvatar = (props) => {
           accessibilityLabel={'Add avatar'}
           onPress={async () => {
             const result = await pickImage();
-            setForm((prev) => ({ ...prev, avatarUrl: result.assets[0].uri }));
+            setForm((prev) => ({
+              ...prev,
+              avatarUrl: result?.assets[0].uri || null,
+            }));
           }}
         >
           <Image
-            source={require('../../assets/images/addAvatar.png')}
+            source={require('../assets/images/addAvatar.png')}
             style={styles.addAvatarBtnImg}
           />
         </Pressable>
@@ -35,7 +38,7 @@ export const AddAvatar = (props) => {
           onPress={() => setForm((prev) => ({ ...prev, avatarUrl: '' }))}
         >
           <Image
-            source={require('../../assets/images/removeAvatar.png')}
+            source={require('../assets/images/removeAvatar.png')}
             style={styles.addAvatarBtnImg}
           />
         </Pressable>

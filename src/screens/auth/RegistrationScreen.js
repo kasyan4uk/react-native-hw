@@ -5,15 +5,18 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
   Pressable,
   useWindowDimensions,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
 
 import colors from '../../assets/colors';
-import smallDevice from '../../components/utils/smallDevice';
-import { common } from '../../components/common';
-import { isBtnDisable } from '../../components/utils/isBtnDisable';
+import common from '../../components/common';
+import smallDevice from '../../utils/smallDeviceDimens';
+import { AddAvatar } from '../../components/AddAvatar';
+import { isBtnDisable } from '../../utils/isBtnDisable';
+import { authSignUp } from '../../redux/auth/authOperations';
+
 
 const {
   TextRobotoMedium,
@@ -22,7 +25,6 @@ const {
   Input,
   Password,
   MainContainer,
-  AddAvatar,
 } = common;
 
 const initFormState = {
@@ -33,35 +35,31 @@ const initFormState = {
 };
 
 export const RegistrationScreen = ({ navigation }) => {
-  const [isKeyboardShown, setIsKeyboardShown] = useState(false);
   const [form, setForm] = useState(initFormState);
+  const dispatch = useDispatch();
 
   const { width: deviceWidth, height: deviceHeight } = useWindowDimensions();
 
   const handleInputChange = ({ name, value }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-  const handleKeybordToggle = (status) => {
-    setIsKeyboardShown(status);
-  };
   const handleFormSubmit = () => {
-    navigation.navigate('Home');
-    Keyboard.dismiss();
+    dispatch(authSignUp(form));
     setForm(initFormState);
   };
 
   return (
     <MainContainer>
-      <ImageBackground
-        style={{
-          ...styles.backgroundImage,
-          height: deviceHeight,
-          width: deviceWidth,
-        }}
-        source={require('../../assets/images/PhotoBG.jpg')}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        <ImageBackground
+          style={{
+            ...styles.backgroundImage,
+            height: deviceHeight,
+            width: deviceWidth,
+          }}
+          source={require('../../assets/images/PhotoBG2x.jpg')}
         >
           <View
             style={{
@@ -85,43 +83,38 @@ export const RegistrationScreen = ({ navigation }) => {
               value={form.login}
               placeholder="Логін"
               onInputChange={handleInputChange}
-              onKeybordToggle={handleKeybordToggle}
             />
             <Input
               name={'email'}
               value={form.email}
               placeholder="Адреса електронної пошти"
               onInputChange={handleInputChange}
-              onKeybordToggle={handleKeybordToggle}
             />
             <Password
               name={'password'}
               value={form.password}
               placeholder="Пароль"
               onInputChange={handleInputChange}
-              onKeybordToggle={handleKeybordToggle}
             />
-            {!isKeyboardShown && (
-              <Btn
-                title="Зареєструватися"
-                onFormSubmit={handleFormSubmit}
-                isDisable={isBtnDisable(form)}
-                style={{ marginTop: 43 }}
-              />
-            )}
-            {!isKeyboardShown && (
-              <Pressable
-                style={styles.navWrapper}
-                onPress={() => navigation.navigate('Login')}
-              >
-                <TextRobotoRegular style={styles.navLink}>
-                  {'Вже є акаунт? Увійти'}
-                </TextRobotoRegular>
-              </Pressable>
-            )}
+
+            <Btn
+              title="Зареєструватися"
+              onFormSubmit={handleFormSubmit}
+              isDisable={isBtnDisable(form)}
+              style={{ marginTop: 43 }}
+            />
+
+            <Pressable
+              style={styles.navWrapper}
+              onPress={() => navigation.navigate('Login')}
+            >
+              <TextRobotoRegular style={styles.navLink}>
+                {'Вже є акаунт? Увійти'}
+              </TextRobotoRegular>
+            </Pressable>
           </View>
-        </KeyboardAvoidingView>
-      </ImageBackground>
+        </ImageBackground>
+      </KeyboardAvoidingView>
     </MainContainer>
   );
 };
