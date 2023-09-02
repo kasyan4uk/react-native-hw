@@ -5,7 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
 
-import { store } from './src/redux/store';
+import { store, persistor } from './src/redux/store';
 import { loadFonts } from './src/utils/loadFonts';
 import { RegistrationScreen } from './src/screens/auth/RegistrationScreen';
 import { LoginScreen } from './src/screens/auth/LoginScreen';
@@ -13,6 +13,7 @@ import { HomeScreen } from './src/screens/main/HomeScreen';
 import { selectIsAuth } from './src/redux/auth/authSelector';
 import { setUser } from './src/redux/auth/authSlice';
 import { auth } from './src/firebase/firebase.config';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const Stack = createStackNavigator();
 
@@ -79,7 +80,9 @@ export default () => {
   } else {
     return (
       <Provider store={store}>
-        <App />
+        <PersistGate persistor={persistor}>
+          <App />
+        </PersistGate>
       </Provider>
     );
   }
